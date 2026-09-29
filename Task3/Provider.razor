@@ -1,0 +1,101 @@
+@page "/providers"
+@rendermode InteractiveServer
+
+<h3>Providers</h3>
+
+<label for="searchBox">Search Provider</label>
+<input id="searchBox"
+       @bind="searchText"
+       @bind:event="oninput" />
+
+<br />
+<br />
+
+<button @onclick="SortProviders">Sort By Name</button>
+
+<br />
+<br />
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Specialty</th>
+            <th>Active</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var provider in GetFilteredProviders())
+        {
+            <tr>
+                <td>@provider.Name</td>
+                <td>@provider.Specialty</td>
+                <td>@provider.Active</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private string searchText = "";
+
+    private List<Provider> providers = new List<Provider>();
+
+
+    protected override void OnInitialized()
+    {
+       
+        // In real project data should come from database but here i am hardcoding it as we dont have it
+        providers = new List<Provider>()
+        {
+            new Provider
+            {
+                Name = "Dr. Smith",
+                Specialty = "Cardiology",
+                Active = true
+            },
+
+            new Provider
+            {
+                Name = "Dr. Patel",
+                Specialty = "Pediatrics",
+                Active = true
+            },
+
+            new Provider
+            {
+                Name = "Dr. Lee",
+                Specialty = "Neurology",
+                Active = false
+            }
+        };
+    }
+
+
+    private List<Provider> GetFilteredProviders()
+    {
+        return providers
+            .Where(p => p.Name.Contains(
+                searchText,
+                StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+
+    private void SortProviders()
+    {
+        providers = providers
+            .OrderBy(p => p.Name)
+            .ToList();
+    }
+
+
+    public class Provider
+    {
+        public string Name { get; set; } = "";
+        public string Specialty { get; set; } = "";
+        public bool Active { get; set; }
+    }
+}
