@@ -1,0 +1,26 @@
+Task 4: Code review
+
+The issue I noticed is that the SQL query is being built by adding the id value into the query string. I would avoid thats and use paramterized query instead. It is safer and also keeps the SQL cleaner.
+
+so code should look like.
+
+public List<Provider> GetActiveProviders(List<int> providerIds)
+{
+    var results = new List<Provider>();
+
+    foreach (var id in providerIds)
+    {
+        var provider = _connection.QueryFirstOrDefault<Provider>(
+            "SELECT * FROM Providers WHERE ProviderId = @ProviderId AND Active = 1",
+            new { ProviderId = id });
+
+        if (provider != null)
+        {
+            results.Add(provider);
+        }
+    }
+
+    return results;
+}
+
+I would also keep in mind that this code makes one database call for every provider ID, so if the list is large, I would eventually look at fetching them in a single query instead. The main fix for this task, though, is using a parameterized query.
